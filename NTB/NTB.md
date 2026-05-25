@@ -477,6 +477,328 @@ Host → SMB Server
 
 Ý nghĩa: Dùng xác thực trước khi truy cập tài nguyên chia sẻ trong domain Windows.
 
+```Method thu thập thông tin khi phân tích network traffic```
 
+Network traffic analysis kết hợp nhiều ngôn ngữ để:
 
+- Phân tích traffic 
+
+- Tìm pattern bất thường 
+
+- Hỗ trợ điều tra và phản ứng sự cố 
+
+Nguồn thông tin chính
+
+- Logs
+
+- Full Packet Capture (PCAP)
+
+- Network Statistics
+
+1. Logs 
+
+Khái niệm
+
+- Là nguồn thông tin đầu tiên để biết điều gì đang xảy ra trong mạng.
+
+- Hầu hết hệ thống và protocol đều có cơ chế logging.
+
+Đặc điểm
+
+- Không có chuẩn logging chung cho mọi hệ thống.
+
+- Mỗi vendor tự quyết định:
+
+    - Format log
+
+    - Dữ liệu được log
+
+Ví dụ:
+
+- Microsoft → Windows Event Logs
+
+- Linux → Syslog
+
+- Apache → CLF (Common Log Format)
+
+Nội dung log thường có
+
+- Source IP
+
+- Destination IP
+
+- Username
+
+- Timestamp
+
+- Port
+
+Ví dụ log xác thực SSH (Linux Syslog)
+
+- Accepted password for gensane from 192.168.1.50 port 52234 ssh2
+
+Ý nghĩa:
+
+- User gensane đăng nhập thành công
+
+- Từ IP 192.168.1.50
+
+- Qua SSH
+
+Ví dụ Apache Access Log
+
+- 192.168.1.50 - - "GET /index.html HTTP/1.1" 200
+
+Ý nghĩa:
+
+- Client gửi HTTP GET request
+
+- Truy cập file /index.html
+
+- Status code 200 = thành công
+
+Chuẩn gửi log phổ biến 
+
+Cần:
+
+- Syslog
+
+- SNMP 
+
+Khi log không đủ thông tin 
+
+Cần:
+
+- Correlate logs
+
+- Kiểm tra Full Packet Capture
+
+- Kiểm tra network statistics
+
+2. Full Packet Capture 
+
+Khái niệm
+
+- Thu thập toàn bộ packet qua mạng 
+
+- Cho phép kiểm tra nội dung packet chi tiết
+
+Cách thu packet 
+
+Có 2 cách:
+
+2.1 Network TAP 
+
+Khái niệm
+
+- Thiết bị vật lý đặt inline trong mạng 
+
+- Copy toàn bộ traffic mà không ảnh hưởng hiệu năng 
+
+Cách hoạt động 
+
+- Sao chép traffic đi qua 
+
+- Gửi bản copy tới 
+
+    - Packet capture box
+
+    - IDS/IPS
+
+    - Monitoring system
+
+Đặc điểm 
+
+- Hoạt dộng ở link layer 
+
+- Không cần:
+
+    - MAC address 
+
+    - IP address 
+
+Ví:
+
+- Copy tín hiệu điện/quang trực tiếp 
+
+Ưu điểm
+
+- Không gây delay mạng 
+
+- Ảnh hưởng hiệu năng gần như bằng 0
+
+2.2 Port Mirroring (SPAN)
+
+Khái niệm
+
+- Copy packet bằng phần mềm switch/router
+
+Cách hoạt động 
+
+- Copy traffic từ một port sang port khác để monitoring.
+
+Ví dụ Cisco SPAN:
+
+```
+monitor session 1 source interface fastEthernet0/1
+monitor session 1 destination interface fastEthernet0/2
+```
+
+Ý nghĩa
+
+- Traffic ở fastEthernet0/1
+
+- Được copy sang fastEthernet0/2
+
+Monitoring device sẽ nhận bản copy này.
+
+Đặc điểm
+
+- Có thể dùng trên
+
+    - Physical switch
+
+    - Virtual switch (VMware vSwitch)
+
+    - Cloud environment
+
+Ví dụ cloud:
+
+- AWS VPC Traffic Mirroring
+
+`Best Practices khi Full Packet Capture` 
+
+Placement 
+
+- Đặt TAP hoặc mirror đúng vị trí cần giám sát 
+
+Duration 
+
+- Full packet capture cần nhiều storage 
+
+Mirror vs TAP 
+
+TAP 
+
+- Gần như không ảnh hưởng
+
+Mirroring
+
+- Có ảnh hưởng performance khi traffic lớn
+
+Công cụ phân tích packet 
+
+- Wireshark
+
+- TCPDump
+
+- Snort
+
+- Suricata
+
+- Zeek 
+
+3. Network Statistics 
+
+Khái niệm
+
+- Thu thập metadata về network flow
+
+- Không lưu packet đầy đủ   
+
+Ví dụ
+
+- Số lượng DNS requests
+
+- Source/Destination IP
+
+- Port
+
+- Protocol 
+
+- Packet count 
+
+Mục tiêu
+
+- Tìm anomaly trong mạng
+
+3.1 NetFlow
+
+Khái niệm
+
+- Protocol do Cisco phát triển 
+
+- Thu thập metadata về traffic flow 
+
+Không chứa 
+
+- Nội dung packet 
+
+- Full packet capture 
+
+Chỉ chứa metadata như: 
+
+- Source IP
+
+- Destination IP 
+
+- Port 
+
+- Protocol 
+
+- Bytes 
+
+- Packet count 
+
+- Timestamp 
+
+Dùng để phát hiện 
+
+- C2 Traffic 
+
+- Data exfiltraion 
+
+- Lateral movement
+
+3.2 IPFIX 
+
+Khái niệm
+
+- Successor của NetFlow
+
+- Chuẩn trung lập (vendor-neutral)
+
+Lý do xuất hiện
+
+- NetFlow ban đầu chỉ dành cho Cisco 
+
+- Từ NetFlow v9 mới hỗ trợ template cho vendor khác 
+
+IETF tạo ra: IPFIX để chuẩn hóa và mở rộng NetFlow
+
+Đặc điểm:
+
+- Tương tự NetFlow
+
+- Linh hoạt hơn trong chọn field cần capture
+
+`Triển khai NetFlow/IPFIX`
+
+Không cần hạ tầng mới
+
+Thông thường 
+
+1. Enable protocol trên thiết bị 
+
+2. Configure nơi gửi metadata 
+
+Nhiều thiết bị đã hỗ trợ sẵn:
+
+- NGFW
+
+- IDS
+
+- IPS
+
+Có thể collect và phân tích flow data trực tiếp 
 
