@@ -411,13 +411,72 @@ Nếu an toàn → forward về host.
 
 Quy trình DNS trong doanh nghiệp
 
-1. Host gửi DNS query tới Internal DNS Server qua port 53.
+- Host gửi DNS query tới Internal DNS Server qua port 53.
 
-2. DNS server kiểm tra cache:
+- DNS server kiểm tra cache:
 
     - Có cache -> trả lời ngay
 
     - Không có -> gửi query ra Internet
 
-3. 
+- Query đi qua:
+
+```
+Internal DNS
+→ Router
+→ Firewall
+→ External DNS Server
+```
+- DNS response quay lại theo đường ngược lại 
+
+- Internal DNS trả kết quả cho host
+
+Ý nghĩa:
+
+- Theo dõi DNS ingress/egress traffic.
+
+- Phát hiện DNS tunneling hoặc domain độc hại.
+
+5. SMB with Kerberos Flow
+
+Khái niệm
+
+- SMB dùng để chia sẻ file trong Windows 
+
+Ví dụ: \\FILESERVER\MARKETING
+
+Quy trình hoạt động
+
+Bước 1: Authentication với Kerberos 
+
+- User login vào host.
+
+- Host xác thực với KDC (Key Distribution Center) trên Domain Controller.
+
+- Nhận Ticket Granting Ticket (TGT).
+
+Sau đó: Host dùng TGT để yêu cầu service authentication ticket.
+
+Bước 2: Thiết lập SMB Session
+
+- Host dùng service ticket để kết nối SMB server.
+
+- SMB session được thiết lập.
+
+- User truy cập file share.
+
+Flow đơn giản
+
+```
+Host → Domain Controller (KDC)
+→ Request SMB service ticket
+
+Host → SMB Server
+→ Establish SMB session
+```
+
+Ý nghĩa: Dùng xác thực trước khi truy cập tài nguyên chia sẻ trong domain Windows.
+
+
+
 
