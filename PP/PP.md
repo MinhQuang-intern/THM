@@ -4,7 +4,7 @@
 
 - Nó hoạt động bằng cách kết hợp SPF và DKIM để kiểm tra email có thực sự được gửi từ đúng tên miền hay không 
 
-    - SDF: kiểm tra máy chủ gửi email có được phép gửi mail cho domain đó hay không 
+    - SPF: kiểm tra máy chủ gửi email có được phép gửi mail cho domain đó hay không 
 
     - DKIM: kiểm tra xem email có bị sửa nội dung trong quá trình gửi hay không
 
@@ -122,7 +122,7 @@ Mục đích
 
 ```Encryption```
 
-Người gửi dùng public key cuar người nhận để mã hóa email 
+Người gửi dùng public key của người nhận để mã hóa email 
 
 Người nhận dùng private key để giải mã 
 
