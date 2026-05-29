@@ -413,5 +413,79 @@ spam hàng loạt request.
 
 => đáng nghi.
 
+------------------------------------------------------------------
 
+`1. Tunnelling Traffic là gì?`
+
+Tunnelling = giấu dữ liệu bên trong một protocol hợp lệ để vượt qua firewall/security.
+
+Kiểu:
+
+Bình thường:
+
+```
+Victim → DNS request
+```
+
+Nhìn vô tưởng bình thường.
+
+Nhưng thực ra:
+
+```
+DNS request
+chứa dữ liệu bí mật
+hoặc command C2
+```
+
+Attacker thường dùng:
+
+ICMP (ping)
+DNS
+
+vì:
+
+rất phổ biến và được trust.
+
+`2. ICMP là gì?`
+
+ICMP là protocol dùng để:
+
+```
+ping
+báo lỗi mạng
+test connectivity
+```
+
+Ví dụ:
+
+ping google.com
+
+sẽ sinh:
+
+```
+ICMP Echo Request
+ICMP Echo Reply
+```
+
+`3. ICMP Tunnelling là gì?`
+
+Bình thường ping chỉ nhỏ.
+
+Ví dụ:
+
+64 bytes
+
+Nhưng attacker lợi dụng phần:
+
+payload
+
+để nhét:
+
+```
+command
+file
+HTTP/TCP/SSH data
+```
+
+=> tạo tunnel C2 hoặc exfiltration.
 
